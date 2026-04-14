@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="apple-touch-icon" href="icon-url.png">
+  <title>チャレンジ富士五湖 エイドサポート</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="富士五湖エイド">
+  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22チャレンジ富士五湖エイド%22,%22short_name%22:%22富士五湖エイド%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22orientation%22:%22portrait%22}">
+  <style>
+    :root {
+      --bg-grad-top: #f7f4ec;
+      --bg-grad-bottom: #ece7dc;
+      --card: #fffdf8;
+      --text: #111827;
+      --sub: #4b5563;
+      --border: rgba(17, 24, 39, 0.12);
+      --accent: #15803d;
+      --accent-text: #ffffff;
+      --accent-soft: #e8f5ea;
+      --shadow: rgba(0, 0, 0, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, var(--bg-grad-top) 0%, var(--bg-grad-bottom) 100%);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      height: 100vh;
+      margin: 0 auto;
+      /* 下部の余白を少し増やして見切れを防止 */
+      padding: env(safe-area-inset-top) 20px calc(env(safe-area-inset-bottom) + 16px) 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; 
+      align-items: center;
+    }
+
+    .top-section {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 8px;
+      margin-top: -40px;
+    }
+
+    .title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .progress-wrap {
+      width: 100%;
+    }
+
+    .progress-text {
+      font-size: 0.8rem;
+      color: var(--sub);
+      margin-bottom: 2px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(128, 128, 128, 0.18);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #38bdf8);
+      transition: width 0.3s ease;
+    }
+
+    .card-container {
+      width: 100%;
+      position: relative;
+      perspective: 1000px;
+      z-index: 2;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 12px 18px; /* カード内の上下パディングをさらに圧縮 */
+      box-shadow: 0 8px 24px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      touch-action: none;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .aid-number {
+      display: inline-block;
+      align-self: flex-start;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+    }
+
+    .place {
+      font-size: 1.3rem;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .item {
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 6px 12px;
+    }
+
+    .label {
+      font-size: 0.65rem;
+      color: var(--sub);
+      margin-bottom: 0px;
+      font-weight: 700;
+    }
+
+    .value {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .fixed-footer {
+      width: 100%;
+      margin-top: 20px;
+      padding: 0 4px;
+    }
+
+    .footer-line {
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 2px;
+      color: var(--text);
+    }
+
+    .footer-line.highlight {
+      font-size: 3rem; /* 最大級に大きく調整 */
+      font-weight: 900;
+      color: #b45309;
+      text-align: center;
+      margin-top: 6px;
+      letter-spacing: 0.15em;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top-section">
+      <div class="title">チャレンジ富士五湖 エイドサポート</div>
+      <div class="progress-wrap">
+        <div class="progress-text" id="progressText"></div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-container">
+      <div class="card" id="mainCard">
+        <div class="aid-number" id="aidNumber"></div>
+        <div class="place" id="placeName"></div>
+
+        <div class="grid">
+          <div class="item">
+            <div class="label">距離</div>
+            <div class="value" id="distance"></div>
+          </div>
+          <div class="item">
+            <div class="label">次エイドまで</div>
+            <div class="value" id="nextDistance"></div>
+          </div>
+          <div class="item">
+            <div class="label">給食</div>
+            <div class="value" id="food"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed-footer">
+      <div class="footer-line">【抑制】前半～中盤は、「踏まない」を最優先</div>
+      <div class="footer-line">【補給】30分ごとに必ず入れる。</div>
+      <div class="footer-line">【30秒歩き】60km以降はエイド後に30秒歩き</div>
+      <div class="footer-line highlight">全力前進！</div>
+    </div>
+  </div>
+
+  <script>
+    const aids = [
+      { number: 2,  place: "山中湖毬藻庵駐車場",                 distance: 12.9, next: 6.4, food: "バナナ" },
+      { number: 4,  place: "山中湖交流プラザきらら",             distance: 19.3, next: 11.5, food: "おにぎり、バナナ" },
+      { number: 7,  place: "柳原公園",                           distance: 30.8, next: 9.3, food: "パン、サンキストレモン" },
+      { number: 9,  place: "富士北麓公園上",                     distance: 40.1, next: 9.3, food: "バナナ" },
+      { number: 10, place: "富士河口湖町役場駐車場【往路】",     distance: 46.8, next: 6.8, food: "文明堂カステラ" },
+      { number: 12, place: "東洋大学河口湖セミナーハウス",       distance: 53.6, next: 4.2, food: "文明堂カステラ" },
+      { number: 13, place: "足和田出張所【往路】",               distance: 57.8, next: 6.6, food: "パン" },
+      { number: 15, place: "西湖野鳥の森公園【往路】",           distance: 64.4, next: 5.6, food: "吉田のうどん、バナナ" },
+      { number: 17, place: "精進湖畔駐車場",                     distance: 70.0, next: 6.6, food: "おかゆ、バナナ" },
+      { number: 19, place: "本栖湖県営駐車場",                   distance: 76.6, next: 3.8, food: "バナナ" },
+      { number: 20, place: "本栖湖中ノ倉トイレ駐車場",           distance: 80.4, next: 7.4, food: "パン" },
+      { number: 22, place: "本栖湖畔駐車場",                     distance: 87.8, next: 4.1, food: "ワッフル、いちご" },
+      { number: 23, place: "精進湖民宿村旧入口",                 distance: 91.9, next: 4.9, food: "パン" },
+      { number: 25, place: "西湖野鳥の森公園【復路】",           distance: 96.8, next: 2.9, food: "吉田のうどん、バナナ" },
+      { number: 26, place: "西湖公民館",                         distance: 99.7, next: 4.9, food: "バナナ" },
+      { number: 27, place: "足和田出張所【復路】",               distance: 104.6, next: 7.3, food: "パン" },
+      { number: 29, place: "富士河口湖町役場駐車場【復路】",     distance: 111.9, next: 3.4, food: "おにぎり" },
+      { number: 30, place: "松山油脂株式会社物流センター",       distance: 115.3, next: null, food: "バナナ" }
+    ];
+
+    const INDEX_KEY = "fuji5lakes_aid_index";
+    const mainCard = document.getElementById("mainCard");
+    let currentIndex = Number(localStorage.getItem(INDEX_KEY)) || 0;
+
+    function render() {
+      const aid = aids[currentIndex];
+      document.getElementById("aidNumber").textContent = `給水番号 ${aid.number}`;
+      document.getElementById("placeName").textContent = aid.place;
+      document.getElementById("distance").textContent = `${aid.distance.toFixed(1)} km`;
+      document.getElementById("nextDistance").textContent = aid.next ? `${aid.next.toFixed(1)} km` : "FINISH!";
+      document.getElementById("food").textContent = aid.food || "―";
+      
+      document.getElementById("progressText").textContent = `${currentIndex + 1} / ${aids.length}`;
+      document.getElementById("progressFill").style.width = `${((currentIndex + 1) / aids.length) * 100}%`;
+      
+      localStorage.setItem(INDEX_KEY, currentIndex);
+    }
+
+    let startY = 0;
+    let currentDeltaY = 0;
+
+    mainCard.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].clientY;
+      mainCard.style.transition = "none";
+    });
+
+    mainCard.addEventListener("touchmove", (e) => {
+      currentDeltaY = e.touches[0].clientY - startY;
+      if ((currentIndex === 0 && currentDeltaY > 0) || 
+          (currentIndex === aids.length - 1 && currentDeltaY < 0)) {
+        currentDeltaY *= 0.3;
+      }
+      mainCard.style.transform = `translateY(${currentDeltaY}px)`;
+    });
+
+    mainCard.addEventListener("touchend", () => {
+      mainCard.style.transition = "transform 0.3s ease-out";
+      if (currentDeltaY < -50 && currentIndex < aids.length - 1) {
+        currentIndex++;
+        animateTransition("up");
+      } else if (currentDeltaY > 50 && currentIndex > 0) {
+        currentIndex--;
+        animateTransition("down");
+      } else {
+        mainCard.style.transform = "translateY(0)";
+      }
+      currentDeltaY = 0;
+    });
+
+    function animateTransition(direction) {
+      const outY = direction === "up" ? -20 : 20;
+      mainCard.style.opacity = "0";
+      mainCard.style.transform = `translateY(${outY}px)`;
+      setTimeout(() => {
+        render();
+        mainCard.style.transition = "none";
+        mainCard.style.transform = `translateY(${-outY}px)`;
+        setTimeout(() => {
+          mainCard.style.transition = "all 0.3s ease-out";
+          mainCard.style.opacity = "1";
+          mainCard.style.transform = "translateY(0)";
+        }, 10);
+      }, 100);
+    }
+
+    render();
+  </script>
+</body>
+</html>
