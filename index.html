@@ -44,17 +44,18 @@
       height: 100vh;
       margin: 0 auto;
       /* 下部の余白を少し増やして見切れを防止 */
-      padding: env(safe-area-inset-top) 20px calc(env(safe-area-inset-bottom) + 16px) 20px;
+      padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 12px) 16px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
+      gap: 8px;
     }
 
     .top-section {
       width: 100%;
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
       margin-top: 0;
     }
 
@@ -94,7 +95,7 @@
       position: relative;
       perspective: 1000px;
       z-index: 2;
-      margin: auto 0;
+      margin: 4px 0;
     }
 
     .card {
@@ -155,7 +156,7 @@
 
     .fixed-footer {
       width: 100%;
-      margin-top: 20px;
+      margin-top: 4px;
       padding: 0 4px;
     }
 
@@ -368,3 +369,4 @@
   </script>
 </body>
 </html>
+
