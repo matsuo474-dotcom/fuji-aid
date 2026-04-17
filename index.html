@@ -47,15 +47,15 @@
       padding: env(safe-area-inset-top) 20px calc(env(safe-area-inset-bottom) + 16px) 20px;
       display: flex;
       flex-direction: column;
-      justify-content: center; 
+      justify-content: space-between;
       align-items: center;
     }
 
     .top-section {
       width: 100%;
       text-align: center;
-      margin-bottom: 8px;
-      margin-top: -40px;
+      margin-bottom: 12px;
+      margin-top: 0;
     }
 
     .title {
@@ -94,6 +94,7 @@
       position: relative;
       perspective: 1000px;
       z-index: 2;
+      margin: auto 0;
     }
 
     .card {
@@ -175,6 +176,38 @@
       letter-spacing: 0.15em;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
     }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .nav-button {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-button:active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .nav-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -208,6 +241,10 @@
             <div class="value" id="food"></div>
           </div>
         </div>
+      </div>
+      <div class="button-group">
+        <button class="nav-button" id="prevButton">← 前エイド</button>
+        <button class="nav-button" id="nextButton">次エイド →</button>
       </div>
     </div>
 
@@ -243,6 +280,8 @@
 
     const INDEX_KEY = "fuji5lakes_aid_index";
     const mainCard = document.getElementById("mainCard");
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
     let currentIndex = Number(localStorage.getItem(INDEX_KEY)) || 0;
 
     function render() {
@@ -255,6 +294,10 @@
       
       document.getElementById("progressText").textContent = `${currentIndex + 1} / ${aids.length}`;
       document.getElementById("progressFill").style.width = `${((currentIndex + 1) / aids.length) * 100}%`;
+      
+      // ボタンの有効/無効状態を更新
+      prevButton.disabled = currentIndex === 0;
+      nextButton.disabled = currentIndex === aids.length - 1;
       
       localStorage.setItem(INDEX_KEY, currentIndex);
     }
@@ -305,6 +348,21 @@
         }, 10);
       }, 100);
     }
+
+    // ボタンのクリックイベント
+    prevButton.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        animateTransition("down");
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (currentIndex < aids.length - 1) {
+        currentIndex++;
+        animateTransition("up");
+      }
+    });
 
     render();
   </script>
